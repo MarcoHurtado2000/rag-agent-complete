@@ -1,0 +1,429 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Login">
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0e1419;
+    --surface-2: #151d25;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5ff;
+    --accent-dim: rgba(0,229,255,0.12);
+    --accent-glow: rgba(0,229,255,0.25);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.12);
+    --text: #e8edf2;
+    --text-muted: #5a6a7a;
+    --text-dim: #8a9aaa;
+    --danger: #ff4466;
+    --danger-dim: rgba(255,68,102,0.12);
+    --radius: 14px;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Ambient glow */
+  body::after {
+    content: '';
+    position: fixed;
+    top: -200px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 600px;
+    background: radial-gradient(circle, rgba(0,229,255,0.05) 0%, transparent 70%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 420px;
+    padding: 24px;
+    animation: fadeUp 0.5s ease both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Brand */
+  .brand {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  .brand-icon {
+    width: 52px;
+    height: 52px;
+    background: var(--accent-dim);
+    border: 1px solid rgba(0,229,255,0.2);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--accent);
+    margin: 0 auto 16px;
+    box-shadow: 0 0 30px rgba(0,229,255,0.1);
+  }
+
+  .brand-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--accent);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+
+  .brand-title {
+    font-size: 30px;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: var(--text);
+  }
+
+  .brand-title span { color: var(--accent); }
+
+  /* Card */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 32px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card-accent-line {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+  }
+
+  .card-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .card-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* Error */
+  .error-msg {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    color: var(--danger);
+    background: var(--danger-dim);
+    border: 1px solid rgba(255,68,102,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 16px;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .error-msg.visible { display: flex; }
+
+  /* Fields */
+  .field { margin-bottom: 16px; }
+
+  .field-label {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  .field-wrap { position: relative; }
+
+  .field-icon {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+    transition: color 0.2s;
+  }
+
+  .field-wrap:focus-within .field-icon { color: var(--accent); }
+
+  .field-input {
+    width: 100%;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 13px 14px 13px 42px;
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s;
+  }
+
+  .field-input::placeholder { color: var(--text-muted); }
+
+  .field-input:focus {
+    border-color: rgba(0,229,255,0.35);
+    box-shadow: 0 0 0 3px var(--accent-glow);
+  }
+
+  .pwd-toggle {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    transition: color 0.2s;
+  }
+
+  .pwd-toggle:hover { color: var(--text-dim); }
+
+  /* Submit */
+  .submit-btn {
+    width: 100%;
+    margin-top: 8px;
+    padding: 15px;
+    background: linear-gradient(135deg, rgba(0,229,255,0.18), rgba(0,229,255,0.07));
+    color: var(--accent);
+    border: 1px solid rgba(0,229,255,0.3);
+    border-radius: 10px;
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .submit-btn:hover:not(:disabled) {
+    background: var(--accent-dim);
+    border-color: rgba(0,229,255,0.55);
+    box-shadow: 0 0 32px var(--accent-glow);
+  }
+
+  .submit-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .spinner {
+    width: 15px; height: 15px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    display: none;
+    animation: spin 0.7s linear infinite;
+  }
+
+  .loading .spinner  { display: block; }
+  .loading .btn-text { display: none; }
+
+  /* Footer */
+  .footer-note {
+    text-align: center;
+    margin-top: 20px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    letter-spacing: 0.05em;
+  }
+</style>
+
+<div class="shell">
+
+  <div class="brand">
+    <div class="brand-icon">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+        <polyline points="14 2 14 8 20 8"/>
+        <line x1="16" y1="13" x2="8" y2="13"/>
+        <line x1="16" y1="17" x2="8" y2="17"/>
+        <polyline points="10 9 9 9 8 9"/>
+      </svg>
+    </div>
+    <div class="brand-eyebrow">Agente inteligente</div>
+    <h1 class="brand-title">RAG <span>PDF</span></h1>
+  </div>
+
+  <div class="card">
+    <div class="card-accent-line"></div>
+    <div class="card-label">Acceso al sistema</div>
+
+    <div class="error-msg" id="errorMsg">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <span id="errorText">Usuario o contraseña incorrectos.</span>
+    </div>
+
+    <form id="loginForm">
+
+      <div class="field">
+        <label class="field-label" for="username">Usuario</label>
+        <div class="field-wrap">
+          <input
+            type="text"
+            id="username"
+            class="field-input"
+            placeholder="Ingresa tu usuario"
+            autocomplete="username"
+            required
+          />
+          <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label" for="password">Contraseña</label>
+        <div class="field-wrap">
+          <input
+            type="password"
+            id="password"
+            class="field-input"
+            placeholder="••••••••"
+            autocomplete="current-password"
+            required
+          />
+          <svg class="field-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <button type="button" class="pwd-toggle" id="pwdToggle" aria-label="Mostrar contraseña">
+            <svg id="eyeIcon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" id="submitBtn">
+        <span class="btn-text">Iniciar sesión</span>
+        <div class="spinner"></div>
+      </button>
+
+    </form>
+  </div>
+
+  <div class="footer-note">Sistema privado — acceso restringido</div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  const form      = document.getElementById('loginForm');
+  const submitBtn = document.getElementById('submitBtn') as HTMLButtonElement | null;
+  const errorMsg  = document.getElementById('errorMsg');
+  const errorText = document.getElementById('errorText');
+  const pwdToggle = document.getElementById('pwdToggle');
+  const pwdInput  = document.getElementById('password') as HTMLInputElement;
+  const eyeIcon   = document.getElementById('eyeIcon');
+
+  // Password toggle
+  pwdToggle?.addEventListener('click', () => {
+    const isHidden = pwdInput.type === 'password';
+    pwdInput.type = isHidden ? 'text' : 'password';
+    eyeIcon!.innerHTML = isHidden
+      ? `<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/>`
+      : `<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/>`;
+  });
+
+  // Submit
+  form?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const username = (document.getElementById('username') as HTMLInputElement)?.value || '';
+    const password = pwdInput?.value || '';
+
+    if (!username || !password) return;
+
+    submitBtn!.disabled = true;
+    (submitBtn as HTMLElement).classList.add('loading');
+    errorMsg!.classList.remove('visible');
+
+    try {
+      const response = await fetch("http://localhost:8000/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, password })
+      });
+
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+
+      if (!data.token) throw new Error('No token');
+
+      localStorage.setItem("token", data.token);
+      window.location.href = data.role === "supervisor" ? "/supervisor" : "/dashboard";
+
+    } catch {
+      errorMsg!.classList.add('visible');
+      submitBtn!.disabled = false;
+      (submitBtn as HTMLElement).classList.remove('loading');
+    }
+  });
+});
+</script>
+
+</Layout>

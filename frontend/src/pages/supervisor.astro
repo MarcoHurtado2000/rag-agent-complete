@@ -1,0 +1,522 @@
+---
+import Layout from "../layouts/Layout.astro";
+---
+
+<Layout title="Supervisor">
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0e1419;
+    --surface-2: #151d25;
+    --border: rgba(255,255,255,0.07);
+    --accent: #00e5ff;
+    --accent-dim: rgba(0,229,255,0.12);
+    --accent-glow: rgba(0,229,255,0.25);
+    --purple: #b97cff;
+    --purple-dim: rgba(185,124,255,0.12);
+    --purple-glow: rgba(185,124,255,0.2);
+    --green: #00ff88;
+    --green-dim: rgba(0,255,136,0.12);
+    --text: #e8edf2;
+    --text-muted: #5a6a7a;
+    --text-dim: #8a9aaa;
+    --danger: #ff4466;
+    --danger-dim: rgba(255,68,102,0.12);
+    --radius: 14px;
+    --font-display: 'Syne', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-display);
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .shell {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 56px;
+  }
+
+  .logo-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--purple);
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logo-eyebrow::before {
+    content: '';
+    width: 20px;
+    height: 1px;
+    background: var(--purple);
+    display: inline-block;
+  }
+
+  .logo-title {
+    font-size: clamp(28px, 5vw, 40px);
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    line-height: 1;
+    color: var(--text);
+  }
+
+  .logo-title span { color: var(--purple); }
+
+  .logout-btn {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    background: var(--danger-dim);
+    color: var(--danger);
+    border: 1px solid rgba(255,68,102,0.2);
+    padding: 10px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .logout-btn:hover {
+    background: rgba(255,68,102,0.22);
+    border-color: rgba(255,68,102,0.4);
+    box-shadow: 0 0 20px rgba(255,68,102,0.15);
+  }
+
+  /* ── Toolbar ── */
+  .toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 24px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .toolbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .load-btn {
+    font-family: var(--font-display);
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    background: var(--purple-dim);
+    color: var(--purple);
+    border: 1px solid rgba(185,124,255,0.25);
+    padding: 11px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .load-btn:hover:not(:disabled) {
+    background: rgba(185,124,255,0.2);
+    border-color: rgba(185,124,255,0.45);
+    box-shadow: 0 0 28px var(--purple-glow);
+  }
+
+  .load-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* ── Count badge ── */
+  .count-badge {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    padding: 6px 12px;
+    border-radius: 6px;
+  }
+
+  .count-badge.visible { display: block; }
+
+  /* ── Search ── */
+  .search-wrap {
+    position: relative;
+    display: none;
+  }
+
+  .search-wrap.visible { display: block; }
+
+  .search-icon {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    pointer-events: none;
+  }
+
+  .search-input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px 9px 36px;
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 13px;
+    outline: none;
+    transition: all 0.2s;
+    width: 220px;
+  }
+
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .search-input:focus {
+    border-color: rgba(185,124,255,0.35);
+    box-shadow: 0 0 0 3px var(--purple-glow);
+  }
+
+  /* ── Status bar ── */
+  .status-bar {
+    display: none;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    margin-bottom: 16px;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .status-bar.visible { display: flex; }
+  .status-bar.loading { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(185,124,255,0.2); }
+  .status-bar.error   { background: var(--danger-dim); color: var(--danger);  border: 1px solid rgba(255,68,102,0.2); }
+  .status-bar.empty   { background: var(--surface);    color: var(--text-muted); border: 1px solid var(--border); }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    width: 13px; height: 13px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+  }
+
+  /* ── History grid ── */
+  .history-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  /* ── History item ── */
+  .history-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    animation: fadeSlide 0.3s ease both;
+  }
+
+  .history-item:hover {
+    border-color: rgba(185,124,255,0.2);
+    box-shadow: 0 0 20px rgba(185,124,255,0.06);
+  }
+
+  @keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .item-accent { height: 1px; background: linear-gradient(90deg, transparent, var(--purple), transparent); }
+
+  .item-body { padding: 20px 22px; }
+
+  .item-meta {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+
+  .item-index {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+  }
+
+  .item-tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 3px 9px;
+    border-radius: 20px;
+    background: var(--purple-dim);
+    color: var(--purple);
+    border: 1px solid rgba(185,124,255,0.2);
+    letter-spacing: 0.08em;
+  }
+
+  .item-question {
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: var(--text);
+    margin-bottom: 10px;
+    line-height: 1.4;
+  }
+
+  .item-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 14px 0;
+  }
+
+  .item-response-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+  }
+
+  .response-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--green);
+    box-shadow: 0 0 6px var(--green);
+    flex-shrink: 0;
+  }
+
+  .item-response {
+    font-family: var(--font-mono);
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--text-dim);
+  }
+
+  /* Staggered animation delays */
+  .history-item:nth-child(1)  { animation-delay: 0.00s; }
+  .history-item:nth-child(2)  { animation-delay: 0.05s; }
+  .history-item:nth-child(3)  { animation-delay: 0.10s; }
+  .history-item:nth-child(4)  { animation-delay: 0.15s; }
+  .history-item:nth-child(5)  { animation-delay: 0.20s; }
+  .history-item:nth-child(6)  { animation-delay: 0.25s; }
+  .history-item:nth-child(7)  { animation-delay: 0.30s; }
+  .history-item:nth-child(8)  { animation-delay: 0.35s; }
+  .history-item:nth-child(9)  { animation-delay: 0.40s; }
+  .history-item:nth-child(10) { animation-delay: 0.45s; }
+</style>
+
+<div class="shell">
+
+  <!-- Header -->
+  <div class="header">
+    <div class="logo-block">
+      <div class="logo-eyebrow">Vista de administración</div>
+      <h1 class="logo-title">Panel <span>Supervisor</span></h1>
+    </div>
+    <button id="logoutBtn" class="logout-btn">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/>
+      </svg>
+      Cerrar sesión
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <button id="loadHistoryBtn" class="load-btn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 .49-4.5"/>
+        </svg>
+        <span id="loadBtnText">Cargar historial</span>
+      </button>
+
+      <div class="count-badge" id="countBadge">— registros</div>
+    </div>
+
+    <div class="search-wrap" id="searchWrap">
+      <svg class="search-icon" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/>
+      </svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Filtrar..." />
+    </div>
+  </div>
+
+  <!-- Status -->
+  <div class="status-bar" id="statusBar">
+    <span id="statusIcon"></span>
+    <span id="statusText"></span>
+  </div>
+
+  <!-- History list -->
+  <div class="history-grid" id="history"></div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // ── Logout ──
+  document.getElementById('logoutBtn')?.addEventListener('click', () => {
+    localStorage.removeItem('token');
+    sessionStorage.clear();
+    window.location.href = '/login';
+  });
+
+  const loadBtn     = document.getElementById('loadHistoryBtn');
+  const loadBtnText = document.getElementById('loadBtnText');
+  const historyDiv  = document.getElementById('history');
+  const statusBar   = document.getElementById('statusBar');
+  const statusText  = document.getElementById('statusText');
+  const statusIcon  = document.getElementById('statusIcon');
+  const countBadge  = document.getElementById('countBadge');
+  const searchWrap  = document.getElementById('searchWrap');
+  const searchInput = document.getElementById('searchInput');
+
+  let allData = [];
+
+  function escapeHtml(str) {
+    if (!str) return '';
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
+  function setStatus(type, msg, showSpinner = false) {
+    statusBar.className = `status-bar visible ${type}`;
+    statusIcon.innerHTML = showSpinner
+      ? `<div class="spinner"></div>`
+      : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
+    statusText.textContent = msg;
+  }
+
+  function hideStatus() {
+    statusBar.classList.remove('visible');
+  }
+
+  function renderItems(data) {
+    if (!data.length) {
+      setStatus('empty', 'No se encontraron registros.');
+      historyDiv.innerHTML = '';
+      return;
+    }
+
+    hideStatus();
+    historyDiv.innerHTML = data.map((item, i) => `
+      <div class="history-item">
+        <div class="item-accent"></div>
+        <div class="item-body">
+          <div class="item-meta">
+            <span class="item-index"># ${String(i + 1).padStart(3, '0')}</span>
+            <span class="item-tag">Q&amp;A</span>
+          </div>
+          <div class="item-question">${escapeHtml(item.question)}</div>
+          <div class="item-divider"></div>
+          <div class="item-response-label">
+            <div class="response-dot"></div>
+            Respuesta
+          </div>
+          <div class="item-response">${escapeHtml(item.response)}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  if (loadBtn) {
+    loadBtn.addEventListener('click', async () => {
+      loadBtn.disabled = true;
+      loadBtnText.textContent = 'Cargando...';
+      setStatus('loading', 'Obteniendo historial...', true);
+      historyDiv.innerHTML = '';
+      searchWrap.classList.remove('visible');
+      countBadge.classList.remove('visible');
+
+      try {
+        const response = await fetch("http://localhost:8000/history");
+        const data = await response.json();
+        allData = data;
+
+        countBadge.textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
+        countBadge.classList.add('visible');
+
+        if (data.length > 0) {
+          searchWrap.classList.add('visible');
+          hideStatus();
+        }
+
+        renderItems(data);
+        loadBtnText.textContent = 'Recargar';
+      } catch (error) {
+        console.error("Error loading history:", error);
+        setStatus('error', 'Error al cargar el historial. Verifica la conexión.');
+        loadBtnText.textContent = 'Reintentar';
+      } finally {
+        loadBtn.disabled = false;
+      }
+    });
+  }
+
+  // ── Live filter ──
+  searchInput?.addEventListener('input', () => {
+    const q = searchInput.value.toLowerCase();
+    const filtered = allData.filter(item =>
+      item.question?.toLowerCase().includes(q) ||
+      item.response?.toLowerCase().includes(q)
+    );
+    renderItems(filtered);
+  });
+});
+</script>
+
+</Layout>

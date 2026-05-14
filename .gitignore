@@ -1,0 +1,64 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+
+# Virtual environments
+venv/
+env/
+
+# Environment variables
+.env
+
+# MongoDB
+*.wt
+*.lock
+
+# FAISS
+*.index
+*.faiss
+
+# Logs
+*.log
+
+# VSCode
+.vscode/
+
+# JetBrains
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node
+node_modules/
+
+# Astro
+dist/
+
+# Docker
+docker-data/
+
+# Uploads
+uploads/
+
+# PDF files
+*.pdf
+
+# Cache
+.cache/
+
+# Build
+build/
+
+# Coverage
+coverage/
+
+# npm
+package-lock.json
+
+# Yarn
+yarn.lock

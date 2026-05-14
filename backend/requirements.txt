@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+python-multipart
+pymongo
+motor
+python-dotenv
+passlib[bcrypt]
+python-jose
+sentence-transformers
+faiss-cpu
+numpy
+pypdf
+google-genai
+bcrypt
