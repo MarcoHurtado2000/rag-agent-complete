@@ -9,6 +9,7 @@ from app.database import cache_collection
 
 app = FastAPI()
 
+
 @app.on_event("startup")
 async def startup():
     try:
@@ -16,14 +17,14 @@ async def startup():
     except Exception:
         pass
 
+
 # CORS
 app.add_middleware(
     CORSMiddleware,
-
+    # Same-origin in Vercel (frontend calls /api/*). Keep localhost for dev.
     allow_origins=[
         "http://localhost:4321",
     ],
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

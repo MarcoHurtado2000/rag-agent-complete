@@ -162,6 +162,44 @@ GEMINI_API_KEY=TU_API_KEY
 
 ---
 
+# Despliegue en Vercel (Opcion A: Frontend + Backend en un solo proyecto)
+
+Este repo esta preparado para desplegar:
+
+- Frontend (Astro) estatico.
+- Backend (FastAPI) como funcion serverless en Vercel bajo `/api/*`.
+
+## 1) Importar el proyecto
+
+En Vercel: `Add New -> Project` e importa este repositorio.
+
+## 2) Variables de entorno (Vercel)
+
+En `Project Settings -> Environment Variables` configura:
+
+- `MONGO_URI`
+- `DB_NAME`
+- `JWT_SECRET`
+- `GEMINI_API_KEY`
+
+## 3) Build
+
+El frontend llama al backend usando rutas relativas:
+
+- `/api/login`
+- `/api/register`
+- `/api/upload`
+- `/api/ask`
+- `/api/history`
+
+## 4) Notas importantes (serverless)
+
+- En Vercel el filesystem es de solo lectura excepto `/tmp`.
+- Los uploads y el indice FAISS se guardan en `/tmp`, por lo que no hay garantia de persistencia entre reinicios/cold starts.
+- Para produccion real, persiste el indice/embeddings fuera del filesystem (DB/vector DB).
+
+---
+
 # Docker
 
 ## Construir contenedores

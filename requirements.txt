@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+python-multipart
+pymongo
+motor
+python-dotenv
+python-jose
+sentence-transformers
+faiss-cpu
+numpy
+pypdf
+google-genai
+bcrypt
