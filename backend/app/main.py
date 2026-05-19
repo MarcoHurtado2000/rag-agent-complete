@@ -7,7 +7,11 @@ from app.routes.auth_routes import router as auth_router
 from app.routes.supervisor import router as supervisor_router
 from app.database import cache_collection
 
-app = FastAPI()
+app = FastAPI(
+    docs_url="/api/docs",
+    redoc_url="/api/redoc",
+    openapi_url="/api/openapi.json",
+)
 
 # Vercel routes send requests under /api/* (same as Next/Vercel convention).
 api_router = APIRouter(prefix="/api")
