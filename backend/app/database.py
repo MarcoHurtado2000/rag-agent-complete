@@ -14,3 +14,6 @@ db = client[DB_NAME]
 users_collection = db["users"]
 memory_collection = db["memory"]
 cache_collection = db["response_cache"]
+
+# RAG storage (chunks + embeddings)
+rag_chunks_collection = db["rag_chunks"]

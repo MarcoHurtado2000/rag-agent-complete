@@ -25,6 +25,10 @@ async def upload_pdf(file: UploadFile = File(...), user: dict = Depends(require_
 
     chunks = chunk_text(text)
 
-    add_to_index(chunks)
+    inserted = await add_to_index(chunks)
 
-    return {"message": "PDF procesado correctamente", "chunks": len(chunks)}
+    return {
+        "message": "PDF procesado correctamente",
+        "chunks": len(chunks),
+        "indexed": inserted,
+    }

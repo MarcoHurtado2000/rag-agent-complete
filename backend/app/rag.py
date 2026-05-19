@@ -1,15 +1,16 @@
-import faiss
-import numpy as np
-from google import genai
+import math
 import os
+from typing import List, Tuple
+
 from dotenv import load_dotenv
-from sentence_transformers import SentenceTransformer
-import pickle
+from google import genai
+
+from app.database import rag_chunks_collection
+
 
 load_dotenv()
 
 _genai_client = None
-_embedding_model = None
 
 
 def _get_genai_client() -> genai.Client:
@@ -25,73 +26,89 @@ def _get_genai_client() -> genai.Client:
     return _genai_client
 
 
-def _get_embedding_model() -> SentenceTransformer:
-    global _embedding_model
-    if _embedding_model is None:
-        # Lazy-load: evita costo en cold start/import.
-        _embedding_model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _embedding_model
+def _embed_texts(texts: List[str]) -> List[List[float]]:
+    # Gemini embeddings: avoid heavy local ML deps (torch/transformers).
+    client = _get_genai_client()
+    resp = client.models.embed_content(
+        model=os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
+        contents=texts,
+    )
+    embeddings = resp.embeddings or []
+    return [e.values or [] for e in embeddings]
 
 
-dimension = 384
-
-# Vercel serverless file system is read-only except /tmp.
-_TMP_DIR = os.getenv("RAG_TMP_DIR", "/tmp")
-INDEX_PATH = os.path.join(_TMP_DIR, "faiss_index.index")
-CHUNKS_PATH = os.path.join(_TMP_DIR, "document_chunks.pkl")
-
-if os.path.exists(INDEX_PATH) and os.path.exists(CHUNKS_PATH):
-    index = faiss.read_index(INDEX_PATH)
-    with open(CHUNKS_PATH, "rb") as f:
-        document_chunks = pickle.load(f)
-else:
-    index = faiss.IndexFlatL2(dimension)
-    document_chunks = []
-
-
-def save_index():
-    faiss.write_index(index, INDEX_PATH)
-    with open(CHUNKS_PATH, "wb") as f:
-        pickle.dump(document_chunks, f)
+def _cosine(a: List[float], b: List[float]) -> float:
+    if not a or not b or len(a) != len(b):
+        return -1.0
+    dot = 0.0
+    na = 0.0
+    nb = 0.0
+    for i in range(len(a)):
+        av = float(a[i])
+        bv = float(b[i])
+        dot += av * bv
+        na += av * av
+        nb += bv * bv
+    if na <= 0.0 or nb <= 0.0:
+        return -1.0
+    return dot / (math.sqrt(na) * math.sqrt(nb))
 
 
-def add_to_index(chunks):
-    global document_chunks
-    embeddings = _get_embedding_model().encode(chunks)
-    index.add(np.array(embeddings).astype("float32"))
-    document_chunks.extend(chunks)
-    save_index()
+async def add_to_index(chunks: List[str]) -> int:
+    chunks = [c.strip() for c in chunks if c and c.strip()]
+    if not chunks:
+        return 0
+
+    vectors = _embed_texts(chunks)
+    docs = []
+    for chunk, vec in zip(chunks, vectors):
+        if not vec:
+            continue
+        docs.append({"text": chunk, "embedding": vec})
+
+    if not docs:
+        return 0
+
+    await rag_chunks_collection.insert_many(docs)
+    return len(docs)
 
 
-def search(question):
-    if index.ntotal == 0:
-        return ["No hay documentos indexados aún. Sube un PDF primero."]
+async def search(question: str, k: int = 3) -> List[str]:
+    # Simple brute-force cosine search in MongoDB documents.
+    # This is acceptable for small datasets and keeps serverless lightweight.
+    question = (question or "").strip()
+    if not question:
+        return ["Pregunta vacia"]
 
-    question_embedding = _get_embedding_model().encode([question])
-    k = min(3, index.ntotal)
-    D, I = index.search(np.array(question_embedding).astype("float32"), k=k)
-    results = [document_chunks[i] for i in I[0] if i != -1]
+    qvecs = _embed_texts([question])
+    qvec = qvecs[0] if qvecs else []
+    if not qvec:
+        return ["No se pudo generar embedding para la pregunta"]
 
-    if not results:
-        return ["No se encontraron resultados relevantes."]
+    cursor = rag_chunks_collection.find({}, {"text": 1, "embedding": 1})
+    scored: List[Tuple[float, str]] = []
+    async for doc in cursor:
+        score = _cosine(qvec, doc.get("embedding") or [])
+        scored.append((score, doc.get("text") or ""))
 
-    return results
+    scored.sort(key=lambda x: x[0], reverse=True)
+    results = [t for s, t in scored[: max(1, k)] if t]
+    return results or ["No hay documentos indexados aun. Sube un PDF primero."]
 
 
-def ask_gemini(question, context):
+def ask_gemini(question: str, context: str) -> str:
     prompt = f"""
-    Responde usando SOLO el contexto.
+Responde usando SOLO el contexto.
 
-    CONTEXTO:
-    {context}
+CONTEXTO:
+{context}
 
-    PREGUNTA:
-    {question}
-    """
+PREGUNTA:
+{question}
+"""
 
     response = _get_genai_client().models.generate_content(
-        model="gemini-2.5-flash",
+        model=os.getenv("GEMINI_CHAT_MODEL", "gemini-2.5-flash"),
         contents=prompt,
     )
-
     return response.text

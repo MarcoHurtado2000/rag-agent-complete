@@ -7,11 +7,9 @@ import hashlib
 
 router = APIRouter()
 
+
 @router.post("/ask")
-async def ask_question(
-    data: Question,
-    user: dict = Depends(require_auth)
-):
+async def ask_question(data: Question, user: dict = Depends(require_auth)):
 
     question_hash = hashlib.md5(data.question.lower().strip().encode()).hexdigest()
     cached = await cache_collection.find_one({"hash": question_hash})
@@ -19,30 +17,23 @@ async def ask_question(
         return {
             "answer": cached["answer"],
             "context": cached["context"],
-            "cached": True
+            "cached": True,
         }
 
-    context = search(data.question)
+    context = await search(data.question)
 
-    response = ask_gemini(
-        data.question,
-        "\n".join(context)
+    response = ask_gemini(data.question, "\n".join(context))
+
+    await memory_collection.insert_one(
+        {
+            "question": data.question,
+            "response": response,
+            "username": user.get("username", "anonymous"),
+        }
     )
 
-    await memory_collection.insert_one({
-        "question": data.question,
-        "response": response,
-        "username": user.get("username", "anonymous")
-    })
+    await cache_collection.insert_one(
+        {"hash": question_hash, "answer": response, "context": context}
+    )
 
-    await cache_collection.insert_one({
-        "hash": question_hash,
-        "answer": response,
-        "context": context
-    })
-
-    return {
-        "answer": response,
-        "context": context,
-        "cached": False
-    }
+    return {"answer": response, "context": context, "cached": False}
