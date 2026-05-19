@@ -2,6 +2,7 @@ fastapi
 uvicorn
 python-multipart
 pymongo
+dnspython
 motor
 python-dotenv
 python-jose
