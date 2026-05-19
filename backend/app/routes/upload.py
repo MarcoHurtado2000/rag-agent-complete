@@ -5,6 +5,7 @@ import tempfile
 from app.utils.pdf_loader import extract_text
 from app.utils.chunker import chunk_text
 from app.rag import add_to_index
+from app.database import ensure_db_configured
 from app.auth import require_auth
 
 router = APIRouter()
@@ -15,6 +16,8 @@ os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
 async def upload_pdf(file: UploadFile = File(...), user: dict = Depends(require_auth)):
+
+    ensure_db_configured()
 
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 

@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends
 from app.models import Question
 from app.rag import search, ask_gemini
-from app.database import memory_collection, cache_collection
+from app.database import memory_collection, cache_collection, ensure_db_configured
 from app.auth import require_auth
 import hashlib
 
@@ -10,6 +10,8 @@ router = APIRouter()
 
 @router.post("/ask")
 async def ask_question(data: Question, user: dict = Depends(require_auth)):
+
+    ensure_db_configured()
 
     question_hash = hashlib.md5(data.question.lower().strip().encode()).hexdigest()
     cached = await cache_collection.find_one({"hash": question_hash})

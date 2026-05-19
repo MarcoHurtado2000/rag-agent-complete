@@ -5,7 +5,7 @@ from typing import List, Tuple
 from dotenv import load_dotenv
 from google import genai
 
-from app.database import rag_chunks_collection
+from app.database import rag_chunks_collection, ensure_db_configured
 
 
 load_dotenv()
@@ -55,6 +55,7 @@ def _cosine(a: List[float], b: List[float]) -> float:
 
 
 async def add_to_index(chunks: List[str]) -> int:
+    ensure_db_configured()
     chunks = [c.strip() for c in chunks if c and c.strip()]
     if not chunks:
         return 0
@@ -74,6 +75,7 @@ async def add_to_index(chunks: List[str]) -> int:
 
 
 async def search(question: str, k: int = 3) -> List[str]:
+    ensure_db_configured()
     # Simple brute-force cosine search in MongoDB documents.
     # This is acceptable for small datasets and keeps serverless lightweight.
     question = (question or "").strip()

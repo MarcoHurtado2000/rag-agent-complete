@@ -15,6 +15,8 @@ async def health():
     db_ok = False
     db_error = None
     try:
+        if client is None:
+            raise RuntimeError("Mongo client no inicializado (MONGO_URI faltante)")
         await client.admin.command("ping")
         db_ok = True
     except Exception as e:

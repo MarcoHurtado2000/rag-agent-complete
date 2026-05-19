@@ -1,11 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException
-from app.database import memory_collection
+from app.database import memory_collection, ensure_db_configured
 from app.auth import require_auth
 
 router = APIRouter()
 
+
 @router.get("/history")
 async def history(user: dict = Depends(require_auth)):
+
+    ensure_db_configured()
 
     if user.get("role") != "supervisor":
         raise HTTPException(403, "Acceso denegado")
