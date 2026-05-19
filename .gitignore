@@ -60,7 +60,8 @@ build/
 coverage/
 
 # npm
-package-lock.json
+/package-lock.json
+!frontend/package-lock.json
 
 # Yarn
 yarn.lock
