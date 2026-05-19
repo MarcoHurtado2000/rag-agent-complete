@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, APIRouter
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.routes.upload import router as upload_router
@@ -8,6 +8,9 @@ from app.routes.supervisor import router as supervisor_router
 from app.database import cache_collection
 
 app = FastAPI()
+
+# Vercel routes send requests under /api/* (same as Next/Vercel convention).
+api_router = APIRouter(prefix="/api")
 
 
 @app.on_event("startup")
@@ -31,7 +34,8 @@ app.add_middleware(
 )
 
 # Rutas
-app.include_router(upload_router)
-app.include_router(ask_router)
-app.include_router(auth_router)
-app.include_router(supervisor_router)
+api_router.include_router(upload_router)
+api_router.include_router(ask_router)
+api_router.include_router(auth_router)
+api_router.include_router(supervisor_router)
+app.include_router(api_router)
