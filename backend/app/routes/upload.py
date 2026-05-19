@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import APIRouter, UploadFile, File, Depends, HTTPException
 import os
 import tempfile
 
@@ -19,16 +19,32 @@ async def upload_pdf(file: UploadFile = File(...), user: dict = Depends(require_
 
     ensure_db_configured()
 
+    if not file.filename:
+        raise HTTPException(status_code=400, detail="Archivo invalido")
+
     file_path = os.path.join(UPLOAD_DIR, file.filename)
 
     with open(file_path, "wb") as f:
         f.write(await file.read())
 
-    text = extract_text(file_path)
+    try:
+        text = extract_text(file_path)
+    except Exception as e:
+        raise HTTPException(
+            status_code=400, detail=f"Error leyendo PDF: {str(e)[:200]}"
+        )
+
+    if not text.strip():
+        raise HTTPException(status_code=400, detail="No se pudo extraer texto del PDF")
 
     chunks = chunk_text(text)
 
-    inserted = await add_to_index(chunks)
+    try:
+        inserted = await add_to_index(chunks)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Error indexando contenido: {str(e)[:200]}"
+        )
 
     return {
         "message": "PDF procesado correctamente",

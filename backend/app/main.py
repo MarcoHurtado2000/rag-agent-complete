@@ -1,5 +1,8 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+import traceback
+import uuid
 
 from app.routes.upload import router as upload_router
 from app.routes.ask import router as ask_router
@@ -13,6 +16,18 @@ app = FastAPI(
     redoc_url="/api/redoc",
     openapi_url="/api/openapi.json",
 )
+
+
+@app.exception_handler(Exception)
+async def unhandled_exception_handler(_request: Request, exc: Exception):
+    error_id = uuid.uuid4().hex
+    # Logged in Vercel function logs for debugging.
+    print(f"Unhandled exception error_id={error_id}\n{traceback.format_exc()}")
+    return JSONResponse(
+        status_code=500,
+        content={"detail": "Internal Server Error", "error_id": error_id},
+    )
+
 
 # Vercel routes send requests under /api/* (same as Next/Vercel convention).
 api_router = APIRouter(prefix="/api")
