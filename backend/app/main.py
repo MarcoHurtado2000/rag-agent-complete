@@ -5,6 +5,7 @@ from app.routes.upload import router as upload_router
 from app.routes.ask import router as ask_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.supervisor import router as supervisor_router
+from app.routes.health import router as health_router
 from app.database import cache_collection
 
 app = FastAPI(
@@ -42,4 +43,5 @@ api_router.include_router(upload_router)
 api_router.include_router(ask_router)
 api_router.include_router(auth_router)
 api_router.include_router(supervisor_router)
+api_router.include_router(health_router)
 app.include_router(api_router)
