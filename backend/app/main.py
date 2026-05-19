@@ -5,8 +5,16 @@ from app.routes.upload import router as upload_router
 from app.routes.ask import router as ask_router
 from app.routes.auth_routes import router as auth_router
 from app.routes.supervisor import router as supervisor_router
+from app.database import cache_collection
 
 app = FastAPI()
+
+@app.on_event("startup")
+async def startup():
+    try:
+        await cache_collection.create_index("created_at", expireAfterSeconds=86400)
+    except Exception:
+        pass
 
 # CORS
 app.add_middleware(

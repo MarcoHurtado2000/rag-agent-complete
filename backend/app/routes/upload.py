@@ -1,9 +1,10 @@
-from fastapi import APIRouter, UploadFile, File
+from fastapi import APIRouter, UploadFile, File, Depends
 import os
 
 from app.utils.pdf_loader import extract_text
 from app.utils.chunker import chunk_text
 from app.rag import add_to_index
+from app.auth import require_auth
 
 router = APIRouter()
 
@@ -12,7 +13,10 @@ UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 @router.post("/upload")
-async def upload_pdf(file: UploadFile = File(...)):
+async def upload_pdf(
+    file: UploadFile = File(...),
+    user: dict = Depends(require_auth)
+):
 
     file_path = f"{UPLOAD_DIR}/{file.filename}"
 

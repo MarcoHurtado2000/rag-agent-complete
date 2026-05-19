@@ -19,6 +19,8 @@ env/
 # FAISS
 *.index
 *.faiss
+faiss_index.index
+document_chunks.pkl
 
 # Logs
 *.log

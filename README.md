@@ -156,6 +156,7 @@ Crear archivo `.env` dentro de `backend/`
 ```env
 MONGO_URI=mongodb://localhost:27017
 DB_NAME=rag_db
+JWT_SECRET=tu_clave_secreta_aqui
 GEMINI_API_KEY=TU_API_KEY
 ```
 
@@ -189,10 +190,27 @@ docker compose down
 POST /register
 ```
 
+Body:
+```json
+{
+  "username": "miusuario",
+  "password": "miPassword123",
+  "role": "user"
+}
+```
+
 ### Login
 
 ```http
 POST /login
+```
+
+Response:
+```json
+{
+  "token": "eyJ...",
+  "role": "user"
+}
 ```
 
 ---
@@ -203,6 +221,7 @@ POST /login
 
 ```http
 POST /upload
+Authorization: Bearer <token>
 ```
 
 ---
@@ -213,7 +232,21 @@ POST /upload
 
 ```http
 POST /ask
+Authorization: Bearer <token>
 ```
+
+---
+
+## Supervisor
+
+### Ver historial
+
+```http
+GET /history
+Authorization: Bearer <token>
+```
+
+Solo accesible para usuarios con rol `supervisor`.
 
 ---
 

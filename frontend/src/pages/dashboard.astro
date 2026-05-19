@@ -9,163 +9,19 @@ import Layout from "../layouts/Layout.astro";
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 
 <style>
-  :root {
-    --bg: #080c10;
-    --surface: #0e1419;
-    --surface-2: #151d25;
-    --border: rgba(255,255,255,0.07);
-    --accent: #00e5ff;
-    --accent-dim: rgba(0,229,255,0.12);
-    --accent-glow: rgba(0,229,255,0.25);
-    --green: #00ff88;
-    --green-dim: rgba(0,255,136,0.12);
-    --text: #e8edf2;
-    --text-muted: #5a6a7a;
-    --text-dim: #8a9aaa;
-    --danger: #ff4466;
-    --danger-dim: rgba(255,68,102,0.12);
-    --radius: 14px;
-    --font-display: 'Syne', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-display);
-    min-height: 100vh;
-  }
-
-  /* ── Noise overlay ── */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .shell {
-    position: relative;
-    z-index: 1;
     max-width: 860px;
     margin: 0 auto;
     padding: 48px 24px 80px;
   }
 
-  /* ── Header ── */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 56px;
-  }
-
-  .logo-block {}
-
-  .logo-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--accent);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .logo-eyebrow::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: var(--accent);
-    display: inline-block;
-  }
-
-  .logo-title {
-    font-size: clamp(28px, 5vw, 40px);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    color: var(--text);
-  }
-
-  .logo-title span {
-    color: var(--accent);
-  }
-
-  .logout-btn {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(255,68,102,0.2);
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .logout-btn:hover {
-    background: rgba(255,68,102,0.22);
-    border-color: rgba(255,68,102,0.4);
-    box-shadow: 0 0 20px rgba(255,68,102,0.15);
-  }
-
-  /* ── Cards ── */
   .card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    padding: 28px;
     margin-bottom: 20px;
-    position: relative;
-    overflow: hidden;
     transition: border-color 0.3s;
   }
 
-  .card:hover {
-    border-color: rgba(255,255,255,0.12);
-  }
+  .card:hover { border-color: rgba(255,255,255,0.12); }
 
-  .card-accent-line {
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 1px;
-  }
-
-  .card-accent-line.cyan { background: linear-gradient(90deg, transparent, var(--accent), transparent); }
-  .card-accent-line.green { background: linear-gradient(90deg, transparent, var(--green), transparent); }
-
-  .card-label {
-    font-family: var(--font-mono);
-    font-size: 10px;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 20px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .card-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: var(--border);
-  }
-
-  /* ── File Upload Zone ── */
   .drop-zone {
     border: 1.5px dashed rgba(0,229,255,0.2);
     border-radius: 10px;
@@ -204,18 +60,8 @@ import Layout from "../layouts/Layout.astro";
     color: var(--accent);
   }
 
-  .drop-title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 4px;
-    color: var(--text);
-  }
-
-  .drop-sub {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--text-muted);
-  }
+  .drop-title { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .drop-sub { font-family: var(--font-mono); font-size: 11px; color: var(--text-muted); }
 
   .file-selected-info {
     display: none;
@@ -233,7 +79,6 @@ import Layout from "../layouts/Layout.astro";
 
   .file-selected-info.visible { display: flex; }
 
-  /* ── Upload button ── */
   .upload-btn {
     width: 100%;
     margin-top: 16px;
@@ -260,12 +105,8 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 0 28px rgba(0,255,136,0.15);
   }
 
-  .upload-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  .upload-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* ── Status bar ── */
   .status-bar {
     display: none;
     font-family: var(--font-mono);
@@ -281,11 +122,6 @@ import Layout from "../layouts/Layout.astro";
   .status-bar.loading { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(0,229,255,0.2); }
   .status-bar.success { background: var(--green-dim); color: var(--green); border: 1px solid rgba(0,255,136,0.2); }
   .status-bar.error { background: var(--danger-dim); color: var(--danger); border: 1px solid rgba(255,68,102,0.2); }
-
-  /* ── Question input ── */
-  .question-wrap {
-    position: relative;
-  }
 
   .question-input {
     width: 100%;
@@ -334,17 +170,9 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 0 30px var(--accent-glow);
   }
 
-  .ask-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  .ask-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* ── Response ── */
-  .response-area {
-    display: none;
-    margin-top: 24px;
-  }
-
+  .response-area { display: none; margin-top: 24px; }
   .response-area.visible { display: block; }
 
   .response-header {
@@ -379,14 +207,7 @@ import Layout from "../layouts/Layout.astro";
     animation: fadeSlide 0.3s ease;
   }
 
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(6px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ── Spinner ── */
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
+  .spinner-sm {
     width: 14px; height: 14px;
     border: 2px solid currentColor;
     border-top-color: transparent;
@@ -394,12 +215,13 @@ import Layout from "../layouts/Layout.astro";
     display: none;
     animation: spin 0.7s linear infinite;
   }
-  .loading .spinner { display: block; }
 
-  /* ── Thinking dots ── */
+  .loading .spinner-sm { display: block; }
+
   .thinking {
     display: none;
   }
+
   .thinking.visible {
     display: flex;
     align-items: center;
@@ -417,22 +239,17 @@ import Layout from "../layouts/Layout.astro";
     background: var(--accent);
     animation: bounce 1s ease infinite;
   }
+
   .thinking span:nth-child(2) { animation-delay: 0.15s; }
   .thinking span:nth-child(3) { animation-delay: 0.3s; }
-
-  @keyframes bounce {
-    0%, 60%, 100% { transform: translateY(0); opacity: 0.4; }
-    30% { transform: translateY(-5px); opacity: 1; }
-  }
 </style>
 
 <div class="shell">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="logo-block">
-      <div class="logo-eyebrow">Agente inteligente</div>
-      <h1 class="logo-title">RAG <span>PDF</span></h1>
+  <div class="page-header">
+    <div>
+      <div class="logo-eyebrow cyan">Agente inteligente</div>
+      <h1 class="logo-title">RAG <span class="cyan">PDF</span></h1>
     </div>
     <button id="logoutBtn" class="logout-btn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -442,7 +259,6 @@ import Layout from "../layouts/Layout.astro";
     </button>
   </div>
 
-  <!-- Upload Card -->
   <div class="card">
     <div class="card-accent-line green"></div>
     <div class="card-label">01 — Cargar documento</div>
@@ -460,7 +276,7 @@ import Layout from "../layouts/Layout.astro";
 
     <div class="file-selected-info" id="fileInfo">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-      <span id="fileName">archivo.pdf</span>
+      <span id="fileName"></span>
     </div>
 
     <button id="uploadBtn" class="upload-btn" disabled>
@@ -468,7 +284,7 @@ import Layout from "../layouts/Layout.astro";
         <polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/>
       </svg>
       <span id="uploadBtnText">Subir PDF</span>
-      <div class="spinner"></div>
+      <div class="spinner-sm"></div>
     </button>
 
     <div class="status-bar" id="uploadStatus">
@@ -477,26 +293,18 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-  <!-- Ask Card -->
   <div class="card">
     <div class="card-accent-line cyan"></div>
     <div class="card-label">02 — Hacer una pregunta</div>
 
-    <div class="question-wrap">
-      <textarea
-        id="question"
-        class="question-input"
-        placeholder="Ej: ¿Cuál es el argumento principal del documento?"
-        rows="3"
-      ></textarea>
-    </div>
+    <textarea id="question" class="question-input" placeholder="Ej: ¿Cuál es el argumento principal del documento?" rows="3"></textarea>
 
     <button id="askBtn" class="ask-btn">
       <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
       </svg>
       <span id="askBtnText">Preguntar</span>
-      <div class="spinner"></div>
+      <div class="spinner-sm"></div>
     </button>
 
     <div class="thinking" id="thinking">
@@ -517,14 +325,12 @@ import Layout from "../layouts/Layout.astro";
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Logout ──
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
     localStorage.removeItem('token');
     sessionStorage.clear();
     window.location.href = '/login';
   });
 
-  // ── Elements ──
   const pdfInput      = document.getElementById('pdf');
   const dropZone      = document.getElementById('dropZone');
   const fileInfo      = document.getElementById('fileInfo');
@@ -541,17 +347,14 @@ document.addEventListener('DOMContentLoaded', () => {
   const responseArea  = document.getElementById('responseArea');
   const responseDiv   = document.getElementById('response');
 
-  // ── File select ──
-  function onFileSelected(file) {
+  pdfInput.addEventListener('change', () => {
+    const file = pdfInput.files?.[0];
     if (!file) return;
     fileName.textContent = file.name;
     fileInfo.classList.add('visible');
     uploadBtn.disabled = false;
-  }
+  });
 
-  pdfInput.addEventListener('change', () => onFileSelected(pdfInput.files?.[0]));
-
-  // Drag & drop
   dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
   dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
   dropZone.addEventListener('drop', e => {
@@ -559,65 +362,64 @@ document.addEventListener('DOMContentLoaded', () => {
     dropZone.classList.remove('dragover');
     const file = e.dataTransfer.files?.[0];
     if (file) {
-      // Assign to input for consistency
       const dt = new DataTransfer();
       dt.items.add(file);
       pdfInput.files = dt.files;
-      onFileSelected(file);
+      fileName.textContent = file.name;
+      fileInfo.classList.add('visible');
+      uploadBtn.disabled = false;
     }
   });
-
-  // ── Upload ──
-  function setUploadLoading(loading) {
-    uploadBtn.disabled = loading;
-    uploadBtn.classList.toggle('loading', loading);
-    uploadBtnText.textContent = loading ? 'Subiendo...' : 'Subir PDF';
-  }
-
-  function showUploadStatus(type, msg) {
-    uploadStatus.className = `status-bar visible ${type}`;
-    uploadStatusText.textContent = msg;
-  }
 
   uploadBtn.addEventListener('click', async () => {
     const file = pdfInput.files?.[0];
     if (!file) return;
 
-    setUploadLoading(true);
+    uploadBtn.disabled = true;
+    uploadBtn.classList.add('loading');
+    uploadBtnText.textContent = 'Subiendo...';
     uploadStatus.classList.remove('visible');
 
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await fetch("http://localhost:8000/upload", { method: "POST", body: formData });
+      const token = localStorage.getItem("token");
+      const res = await fetch("http://localhost:8000/upload", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}` },
+        body: formData
+      });
       const data = await res.json();
-      showUploadStatus('success', data.message || 'PDF cargado correctamente.');
+      uploadStatus.className = 'status-bar visible success';
+      uploadStatusText.textContent = data.message || 'PDF cargado correctamente.';
     } catch {
-      showUploadStatus('error', 'Error al subir el archivo. Intenta de nuevo.');
+      uploadStatus.className = 'status-bar visible error';
+      uploadStatusText.textContent = 'Error al subir el archivo.';
     } finally {
-      setUploadLoading(false);
+      uploadBtn.disabled = false;
+      uploadBtn.classList.remove('loading');
+      uploadBtnText.textContent = 'Subir PDF';
     }
   });
-
-  // ── Ask ──
-  function setAskLoading(loading) {
-    askBtn.disabled = loading;
-    askBtn.classList.toggle('loading', loading);
-    askBtnText.textContent = loading ? 'Procesando...' : 'Preguntar';
-    thinking.classList.toggle('visible', loading);
-    if (loading) responseArea.classList.remove('visible');
-  }
 
   askBtn.addEventListener('click', async () => {
     const question = questionInput.value.trim();
     if (!question) return;
 
-    setAskLoading(true);
+    askBtn.disabled = true;
+    askBtn.classList.add('loading');
+    askBtnText.textContent = 'Procesando...';
+    thinking.classList.add('visible');
+    responseArea.classList.remove('visible');
 
     try {
+      const token = localStorage.getItem("token");
       const res = await fetch("http://localhost:8000/ask", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
         body: JSON.stringify({ question })
       });
       const data = await res.json();
@@ -627,11 +429,13 @@ document.addEventListener('DOMContentLoaded', () => {
       responseDiv.textContent = 'Ocurrió un error al obtener la respuesta.';
       responseArea.classList.add('visible');
     } finally {
-      setAskLoading(false);
+      askBtn.disabled = false;
+      askBtn.classList.remove('loading');
+      askBtnText.textContent = 'Preguntar';
+      thinking.classList.remove('visible');
     }
   });
 
-  // Enter to submit (Shift+Enter for new line)
   questionInput.addEventListener('keydown', e => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

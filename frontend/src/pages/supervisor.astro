@@ -9,114 +9,10 @@ import Layout from "../layouts/Layout.astro";
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 
 <style>
-  :root {
-    --bg: #080c10;
-    --surface: #0e1419;
-    --surface-2: #151d25;
-    --border: rgba(255,255,255,0.07);
-    --accent: #00e5ff;
-    --accent-dim: rgba(0,229,255,0.12);
-    --accent-glow: rgba(0,229,255,0.25);
-    --purple: #b97cff;
-    --purple-dim: rgba(185,124,255,0.12);
-    --purple-glow: rgba(185,124,255,0.2);
-    --green: #00ff88;
-    --green-dim: rgba(0,255,136,0.12);
-    --text: #e8edf2;
-    --text-muted: #5a6a7a;
-    --text-dim: #8a9aaa;
-    --danger: #ff4466;
-    --danger-dim: rgba(255,68,102,0.12);
-    --radius: 14px;
-    --font-display: 'Syne', sans-serif;
-    --font-mono: 'DM Mono', monospace;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: var(--font-display);
-    min-height: 100vh;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-  }
-
   .shell {
-    position: relative;
-    z-index: 1;
-    max-width: 900px;
+    max-width: 960px;
     margin: 0 auto;
     padding: 48px 24px 80px;
-  }
-
-  /* ── Header ── */
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 56px;
-  }
-
-  .logo-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 11px;
-    color: var(--purple);
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .logo-eyebrow::before {
-    content: '';
-    width: 20px;
-    height: 1px;
-    background: var(--purple);
-    display: inline-block;
-  }
-
-  .logo-title {
-    font-size: clamp(28px, 5vw, 40px);
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1;
-    color: var(--text);
-  }
-
-  .logo-title span { color: var(--purple); }
-
-  .logout-btn {
-    font-family: var(--font-mono);
-    font-size: 12px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    background: var(--danger-dim);
-    color: var(--danger);
-    border: 1px solid rgba(255,68,102,0.2);
-    padding: 10px 18px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .logout-btn:hover {
-    background: rgba(255,68,102,0.22);
-    border-color: rgba(255,68,102,0.4);
-    box-shadow: 0 0 20px rgba(255,68,102,0.15);
   }
 
   /* ── Toolbar ── */
@@ -124,7 +20,7 @@ import Layout from "../layouts/Layout.astro";
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
     gap: 16px;
     flex-wrap: wrap;
   }
@@ -158,12 +54,8 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 0 28px var(--purple-glow);
   }
 
-  .load-btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  .load-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* ── Count badge ── */
   .count-badge {
     display: none;
     font-family: var(--font-mono);
@@ -177,7 +69,6 @@ import Layout from "../layouts/Layout.astro";
 
   .count-badge.visible { display: block; }
 
-  /* ── Search ── */
   .search-wrap {
     position: relative;
     display: none;
@@ -214,7 +105,7 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 0 0 3px var(--purple-glow);
   }
 
-  /* ── Status bar ── */
+  /* ── Status ── */
   .status-bar {
     display: none;
     font-family: var(--font-mono);
@@ -231,8 +122,7 @@ import Layout from "../layouts/Layout.astro";
   .status-bar.error   { background: var(--danger-dim); color: var(--danger);  border: 1px solid rgba(255,68,102,0.2); }
   .status-bar.empty   { background: var(--surface);    color: var(--text-muted); border: 1px solid var(--border); }
 
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .spinner {
+  .spinner-sm {
     width: 13px; height: 13px;
     border: 2px solid currentColor;
     border-top-color: transparent;
@@ -241,14 +131,13 @@ import Layout from "../layouts/Layout.astro";
     flex-shrink: 0;
   }
 
-  /* ── History grid ── */
-  .history-grid {
+  /* ── History list ── */
+  .history-list {
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 16px;
   }
 
-  /* ── History item ── */
   .history-item {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -263,20 +152,18 @@ import Layout from "../layouts/Layout.astro";
     box-shadow: 0 0 20px rgba(185,124,255,0.06);
   }
 
-  @keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(8px); }
-    to   { opacity: 1; transform: translateY(0); }
+  .item-accent {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--purple), transparent);
   }
-
-  .item-accent { height: 1px; background: linear-gradient(90deg, transparent, var(--purple), transparent); }
 
   .item-body { padding: 20px 22px; }
 
-  .item-meta {
+  .item-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
   }
 
   .item-index {
@@ -285,6 +172,12 @@ import Layout from "../layouts/Layout.astro";
     letter-spacing: 0.18em;
     text-transform: uppercase;
     color: var(--text-muted);
+  }
+
+  .item-tags {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
 
   .item-tag {
@@ -298,49 +191,74 @@ import Layout from "../layouts/Layout.astro";
     letter-spacing: 0.08em;
   }
 
-  .item-question {
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    color: var(--text);
-    margin-bottom: 10px;
-    line-height: 1.4;
-  }
-
-  .item-divider {
-    height: 1px;
-    background: var(--border);
-    margin: 14px 0;
-  }
-
-  .item-response-label {
+  .item-user {
     font-family: var(--font-mono);
     font-size: 10px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
     color: var(--text-muted);
-    margin-bottom: 8px;
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 4px;
   }
 
-  .response-dot {
+  .item-user svg { opacity: 0.5; }
+
+  /* Question block */
+  .question-block {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+
+  .block-label {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .block-label .q-dot {
+    width: 5px; height: 5px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .question-text {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* Answer block */
+  .answer-block {
+    padding-left: 16px;
+    border-left: 2px solid rgba(0,255,136,0.2);
+  }
+
+  .answer-block .block-label .a-dot {
     width: 5px; height: 5px;
     border-radius: 50%;
     background: var(--green);
     box-shadow: 0 0 6px var(--green);
-    flex-shrink: 0;
   }
 
-  .item-response {
+  .answer-text {
     font-family: var(--font-mono);
     font-size: 13px;
     line-height: 1.75;
     color: var(--text-dim);
+    white-space: pre-wrap;
   }
 
-  /* Staggered animation delays */
+  /* Staggered animation */
   .history-item:nth-child(1)  { animation-delay: 0.00s; }
   .history-item:nth-child(2)  { animation-delay: 0.05s; }
   .history-item:nth-child(3)  { animation-delay: 0.10s; }
@@ -351,15 +269,31 @@ import Layout from "../layouts/Layout.astro";
   .history-item:nth-child(8)  { animation-delay: 0.35s; }
   .history-item:nth-child(9)  { animation-delay: 0.40s; }
   .history-item:nth-child(10) { animation-delay: 0.45s; }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+  }
+
+  .empty-state svg {
+    margin-bottom: 16px;
+    opacity: 0.3;
+  }
+
+  .empty-state p {
+    font-family: var(--font-mono);
+    font-size: 13px;
+  }
 </style>
 
 <div class="shell">
 
-  <!-- Header -->
-  <div class="header">
-    <div class="logo-block">
-      <div class="logo-eyebrow">Vista de administración</div>
-      <h1 class="logo-title">Panel <span>Supervisor</span></h1>
+  <div class="page-header">
+    <div>
+      <div class="logo-eyebrow purple">Vista de administración</div>
+      <h1 class="logo-title">Panel <span class="purple">Supervisor</span></h1>
     </div>
     <button id="logoutBtn" class="logout-btn">
       <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -369,7 +303,6 @@ import Layout from "../layouts/Layout.astro";
     </button>
   </div>
 
-  <!-- Toolbar -->
   <div class="toolbar">
     <div class="toolbar-left">
       <button id="loadHistoryBtn" class="load-btn">
@@ -378,8 +311,7 @@ import Layout from "../layouts/Layout.astro";
         </svg>
         <span id="loadBtnText">Cargar historial</span>
       </button>
-
-      <div class="count-badge" id="countBadge">— registros</div>
+      <div class="count-badge" id="countBadge"></div>
     </div>
 
     <div class="search-wrap" id="searchWrap">
@@ -390,21 +322,18 @@ import Layout from "../layouts/Layout.astro";
     </div>
   </div>
 
-  <!-- Status -->
   <div class="status-bar" id="statusBar">
     <span id="statusIcon"></span>
     <span id="statusText"></span>
   </div>
 
-  <!-- History list -->
-  <div class="history-grid" id="history"></div>
+  <div class="history-list" id="history"></div>
 
 </div>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
 
-  // ── Logout ──
   document.getElementById('logoutBtn')?.addEventListener('click', () => {
     localStorage.removeItem('token');
     sessionStorage.clear();
@@ -425,30 +354,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function escapeHtml(str) {
     if (!str) return '';
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&#39;');
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
   function setStatus(type, msg, showSpinner = false) {
     statusBar.className = `status-bar visible ${type}`;
     statusIcon.innerHTML = showSpinner
-      ? `<div class="spinner"></div>`
+      ? `<div class="spinner-sm"></div>`
       : `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`;
     statusText.textContent = msg;
   }
 
-  function hideStatus() {
-    statusBar.classList.remove('visible');
-  }
+  function hideStatus() { statusBar.classList.remove('visible'); }
 
   function renderItems(data) {
     if (!data.length) {
-      setStatus('empty', 'No se encontraron registros.');
-      historyDiv.innerHTML = '';
+      historyDiv.innerHTML = `
+        <div class="empty-state">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><path d="M8 15h.01"/><path d="M12 15h.01"/><path d="M16 15h.01"/>
+          </svg>
+          <p>No se encontraron registros.</p>
+        </div>`;
       return;
     }
 
@@ -457,62 +384,66 @@ document.addEventListener('DOMContentLoaded', () => {
       <div class="history-item">
         <div class="item-accent"></div>
         <div class="item-body">
-          <div class="item-meta">
+          <div class="item-top">
             <span class="item-index"># ${String(i + 1).padStart(3, '0')}</span>
-            <span class="item-tag">Q&amp;A</span>
+            <div class="item-tags">
+              ${item.username ? `<span class="item-user"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>${escapeHtml(item.username)}</span>` : ''}
+              <span class="item-tag">Q&A</span>
+            </div>
           </div>
-          <div class="item-question">${escapeHtml(item.question)}</div>
-          <div class="item-divider"></div>
-          <div class="item-response-label">
-            <div class="response-dot"></div>
-            Respuesta
+          <div class="question-block">
+            <div class="block-label"><span class="q-dot"></span> Pregunta</div>
+            <div class="question-text">${escapeHtml(item.question)}</div>
           </div>
-          <div class="item-response">${escapeHtml(item.response)}</div>
+          <div class="answer-block">
+            <div class="block-label"><span class="a-dot"></span> Respuesta</div>
+            <div class="answer-text">${escapeHtml(item.response)}</div>
+          </div>
         </div>
       </div>
     `).join('');
   }
 
-  if (loadBtn) {
-    loadBtn.addEventListener('click', async () => {
-      loadBtn.disabled = true;
-      loadBtnText.textContent = 'Cargando...';
-      setStatus('loading', 'Obteniendo historial...', true);
-      historyDiv.innerHTML = '';
-      searchWrap.classList.remove('visible');
-      countBadge.classList.remove('visible');
+  loadBtn?.addEventListener('click', async () => {
+    loadBtn.disabled = true;
+    loadBtnText.textContent = 'Cargando...';
+    setStatus('loading', 'Obteniendo historial...', true);
+    historyDiv.innerHTML = '';
+    searchWrap.classList.remove('visible');
+    countBadge.classList.remove('visible');
 
-      try {
-        const response = await fetch("http://localhost:8000/history");
-        const data = await response.json();
-        allData = data;
+    try {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:8000/history", {
+        headers: { "Authorization": `Bearer ${token}` }
+      });
+      const data = await response.json();
+      allData = data;
 
-        countBadge.textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
-        countBadge.classList.add('visible');
+      countBadge.textContent = `${data.length} registro${data.length !== 1 ? 's' : ''}`;
+      countBadge.classList.add('visible');
 
-        if (data.length > 0) {
-          searchWrap.classList.add('visible');
-          hideStatus();
-        }
-
-        renderItems(data);
-        loadBtnText.textContent = 'Recargar';
-      } catch (error) {
-        console.error("Error loading history:", error);
-        setStatus('error', 'Error al cargar el historial. Verifica la conexión.');
-        loadBtnText.textContent = 'Reintentar';
-      } finally {
-        loadBtn.disabled = false;
+      if (data.length > 0) {
+        searchWrap.classList.add('visible');
+        hideStatus();
       }
-    });
-  }
 
-  // ── Live filter ──
+      renderItems(data);
+      loadBtnText.textContent = 'Recargar';
+    } catch {
+      setStatus('error', 'Error al cargar el historial.');
+      loadBtnText.textContent = 'Reintentar';
+    } finally {
+      loadBtn.disabled = false;
+    }
+  });
+
   searchInput?.addEventListener('input', () => {
     const q = searchInput.value.toLowerCase();
     const filtered = allData.filter(item =>
       item.question?.toLowerCase().includes(q) ||
-      item.response?.toLowerCase().includes(q)
+      item.response?.toLowerCase().includes(q) ||
+      item.username?.toLowerCase().includes(q)
     );
     renderItems(filtered);
   });
