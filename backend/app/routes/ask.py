@@ -8,6 +8,11 @@ import hashlib
 router = APIRouter()
 
 
+# Bump when the response style/prompt changes to avoid returning stale cached
+# answers generated with older prompts.
+_CACHE_VERSION = "v2-warm-grounded"
+
+
 @router.post("/ask")
 async def ask_question(data: Question, user: dict = Depends(require_auth)):
 
@@ -16,7 +21,9 @@ async def ask_question(data: Question, user: dict = Depends(require_auth)):
     if not data.question or not data.question.strip():
         raise HTTPException(status_code=400, detail="Pregunta vacia")
 
-    question_hash = hashlib.md5(data.question.lower().strip().encode()).hexdigest()
+    question_hash = hashlib.md5(
+        f"{_CACHE_VERSION}:{data.question.lower().strip()}".encode()
+    ).hexdigest()
     cached = await cache_collection.find_one({"hash": question_hash})
     if cached:
         return {

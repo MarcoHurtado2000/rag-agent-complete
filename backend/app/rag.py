@@ -161,8 +161,18 @@ async def search(question: str, k: int = 3) -> List[str]:
 
 
 def ask_gemini(question: str, context: str) -> str:
+    # Keep the assistant warm and helpful, but strictly grounded in the provided context.
     prompt = f"""
-Responde usando SOLO el contexto.
+Eres un asistente amable y claro. Responde en espanol.
+
+REGLAS IMPORTANTES (NO ROMPER):
+1) Responde usando SOLO el CONTEXTO. No inventes, no supongas, no completes con conocimiento externo.
+2) Si el CONTEXTO no contiene la respuesta, di explicitamente: "No lo encuentro en el texto proporcionado".
+3) Si te piden "contexto", "de que trata", "resumen" o algo similar, responde de forma calida y humana:
+   - Empieza con una frase breve tipo: "Claro" / "Con gusto" / "Te cuento".
+   - Da un resumen de 2 a 5 frases basado en el CONTEXTO.
+   - Si hay puntos clave claros, incluyelos en una lista corta.
+4) Si te piden un dato puntual (fecha, nombre, definicion), responde directo y breve.
 
 CONTEXTO:
 {context}
