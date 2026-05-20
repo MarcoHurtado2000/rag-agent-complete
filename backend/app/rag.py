@@ -29,12 +29,23 @@ def _get_genai_client() -> genai.Client:
 def _embed_texts(texts: List[str]) -> List[List[float]]:
     # Gemini embeddings: avoid heavy local ML deps (torch/transformers).
     client = _get_genai_client()
-    resp = client.models.embed_content(
-        model=os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
-        contents=texts,
-    )
-    embeddings = resp.embeddings or []
-    return [e.values or [] for e in embeddings]
+
+    # Vercel/serverless: keep requests bounded. Large PDFs can create many chunks
+    # and a single embed call can time out or exceed request limits.
+    batch_size = int(os.getenv("EMBED_BATCH_SIZE", "32"))
+    batch_size = max(1, min(batch_size, 128))
+
+    out: List[List[float]] = []
+    for i in range(0, len(texts), batch_size):
+        batch = texts[i : i + batch_size]
+        resp = client.models.embed_content(
+            model=os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
+            contents=batch,
+        )
+        embeddings = resp.embeddings or []
+        out.extend([e.values or [] for e in embeddings])
+
+    return out
 
 
 def _cosine(a: List[float], b: List[float]) -> float:
