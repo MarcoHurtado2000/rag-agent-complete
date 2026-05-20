@@ -22,7 +22,11 @@ def _get_genai_client() -> genai.Client:
     if not api_key:
         raise ValueError("GEMINI_API_KEY no esta configurada")
 
-    _genai_client = genai.Client(api_key=api_key)
+    # Use stable v1 API for model availability consistency.
+    _genai_client = genai.Client(
+        api_key=api_key,
+        http_options={"api_version": os.getenv("GEMINI_API_VERSION", "v1")},
+    )
     return _genai_client
 
 
@@ -35,13 +39,60 @@ def _embed_texts(texts: List[str]) -> List[List[float]]:
     batch_size = int(os.getenv("EMBED_BATCH_SIZE", "32"))
     batch_size = max(1, min(batch_size, 128))
 
+    def _candidate_models() -> List[str]:
+        # Order matters: try explicit config first.
+        primary = (os.getenv("GEMINI_EMBEDDING_MODEL") or "").strip()
+        # Reasonable defaults across Gemini APIs.
+        defaults = ["text-embedding-004", "gemini-embedding-001"]
+
+        models: List[str] = []
+        if primary:
+            models.append(primary)
+        models.extend(defaults)
+
+        # Allow explicit fallback override.
+        fallback = (os.getenv("GEMINI_EMBEDDING_MODEL_FALLBACK") or "").strip()
+        if fallback:
+            models.append(fallback)
+
+        # De-dup while preserving order.
+        seen = set()
+        uniq: List[str] = []
+        for m in models:
+            if m not in seen:
+                uniq.append(m)
+                seen.add(m)
+        return uniq
+
     out: List[List[float]] = []
     for i in range(0, len(texts), batch_size):
         batch = texts[i : i + batch_size]
-        resp = client.models.embed_content(
-            model=os.getenv("GEMINI_EMBEDDING_MODEL", "text-embedding-004"),
-            contents=batch,
-        )
+
+        resp = None
+        last_exc = None
+        for model in _candidate_models():
+            # The SDK accepts "text-embedding-004"; some error messages reference
+            # the "models/..." form, so we try both.
+            attempts = [model]
+            if model and not model.startswith("models/"):
+                attempts.append(f"models/{model}")
+
+            for attempt in attempts:
+                try:
+                    resp = client.models.embed_content(model=attempt, contents=batch)
+                    last_exc = None
+                    break
+                except Exception as e:
+                    last_exc = e
+
+            if resp is not None:
+                break
+
+        if resp is None:
+            if last_exc is not None:
+                raise last_exc
+            raise RuntimeError("No se pudo seleccionar un modelo de embeddings")
+
         embeddings = resp.embeddings or []
         out.extend([e.values or [] for e in embeddings])
 
